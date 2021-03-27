@@ -1,19 +1,14 @@
-#from numpy.lib import nanfunctions
+#prg_1_1_lectura_datos.py
+
 import importlib
 import pandas as pd
 import os
 import pickle
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import statistics
-# import numpy as np
-# import seaborn as sns
+
 import time
 from Libs import lib_cmlp as cmlp
 from Libs import lib_bam as lbam
-#from pandas_profiling import ProfileReport
 
-start_time = time.time()
 
 #Path definitions and functions
 #------------------------------
@@ -26,7 +21,7 @@ tmppathres = r'Data/res'
 # 1.- ETL READ DATA
 # =================
 
-# Loading data
+# Loading raw data:
 
 def data_etl_1(lista_data):
 
@@ -42,13 +37,14 @@ def data_etl_1(lista_data):
         for dat in data:
             bam[dat]=lbam.import_bam(dat)
 
-# Renaming columns
+# Renaming columns:
 
         for dat in data:
                 bam[dat].rename(columns={"año": "year"},inplace='True')    
                         
         return bam
 
+# Loading mapping files:
 
 def data_etl_2(lista_maps):
 
@@ -59,3 +55,9 @@ def data_etl_2(lista_maps):
             map_dic[map]=lbam.import_map(map)    
         
         return map_dic
+
+def data_etl_3():
+        igic=pd.read_csv(os.path.join(tmppathent,'igic.csv'), delimiter=';', encoding='latin1', decimal=',',
+                        dtype={'year'  : object, 
+                               'igic'  : float})
+        return igic

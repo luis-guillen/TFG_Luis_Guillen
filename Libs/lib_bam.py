@@ -124,30 +124,60 @@ def import_map(file):
    
    return maps
 
-def lookup_dat(table,dat,year,nif,acctr,acctc):
+def lookup_dat(table,year,nif,acctr,acctc):
 
    value1 = 0
    value2 = 0
    value_final = 0
+   
+   #Sales of merchandises & production
+   if acctr == '02.1.0' and acctc=='01.1.1':
+      #12240	4. Finished goods
+      value1 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12240'].values[0]
+      #12250	5. By-products, waste & recovered materials
+      value2 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12250'].values[0]
+      #12300	III. Trade & other receivables
+      value3 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12300'].values[0]
+      #12400	IV. Current investments in group companies & associates
+      value4 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12400'].values[0]
+      #21100	I. Capital
+      value5 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21100'].values[0]
+      #21200	II. Share premium
+      value6 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21200'].values[0]
+      
+      value_final = value1 + value2 + value3 + value4 + value5 + value6
+   
+   if acctr == '12.2.0' and acctc=='01.1.1':
+      with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
+      # 40110	a) Sales
+      value1 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40100'].values[0]
+      # 40120	b) Services provided
+      value2 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40120'].values[0]
+      # 40130	c) Financial income of holding companies
+      value3 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40130'].values[0]
+      # 40510	a) Non-trading & other operating income
+      value4 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40510'].values[0]
+      # 40520	b) Operating grants taken to income
+      value5 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40520'].values[0]
+      # igic rate
+      value6 = igic.loc[(igic['year']==year)]['igic'].values[0]
+      
+      value_final = value6*(value1+value2+value3+value4) - value5
+      
+   #if acctr == '11.1.0' and acctc=='01.2.1':
 
-   if acctr == '01.1.1' and acctc=='01.1.1':
-      value1 = table[dat].loc[(table[dat]['year']==year)  & (table[dat]['nif']==nif)]['40110']
-      value2 = table[dat].loc[(table[dat]['year']==year)  & (table[dat]['nif']==nif)]['40400']
-      value_final = value1 + value2
+
    return value_final
 
-def bam_generator(table,dat,years,nifs,acctrs,acctcs):
+def bam_generator(table,years,nifs,acctrs,acctcs):
    empty_list = []
    for year in years:
       for nif in nifs:
          for acctr in acctrs:
             for acctc in acctcs:
-               empty_list.append([year,nif,acctr,acctc,lookup_dat(table,dat,year,nif,acctr,acctc)])
+               empty_list.append([year,nif,acctr,acctc,lookup_dat(table,year,nif,acctr,acctc)])
 
    result = pd.DataFrame(empty_list,columns=['year','nif','acctr','acctc','value'])	
-   #result['value'] = result['value'].apply(pd.to_numeric)
-   #result.astype({'value': 'float64'})
-   
    return result
 
 

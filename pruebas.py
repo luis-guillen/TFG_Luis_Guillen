@@ -69,8 +69,15 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
     if acctr == '01.1.1' and acctc=='01.1.1':
         value1 = table.loc[(table['year']==year) & (table['nif']==nif)]['11000'].values[0]
-        value2 = table.loc[(table['year']==year) & (table['nif']==nif)]['40400'].values[0]
+        value2 = table.loc[(table['year']==year) & (table['nif']==nif)]['40400'].values[0]*0
         value_final = value1 + value2
+
+
+
+
+
+
+        
     return value_final
 
 def bam_generator(table,years,nifs,acctsr,acctsc):
@@ -85,16 +92,21 @@ def bam_generator(table,years,nifs,acctsr,acctsc):
     return result
 
 
+a=table.loc[(table['year']=='2018') & (table['nif']=='B38326997')]['11000'].tolist()
+print(type(a))
+print(len(a))
+print(a)
 bam = bam_generator(table,years,nifs,acctsr,acctsc)
 #print(bam.dtypes)
-print(bam.iloc[450:480, 1:5])
+print(bam.iloc[1:450, 0:6])
 #print(years)
 #print(nifs)
 #print(table.head())
-#print(bam.head())
+print(bam.head())
 #print(bam)
-bam1 = bam.loc[(bam["acctr"] == '01.1.1') & (bam["acctc"] == '01.1.1')]
-#print(bam.shape)
-bam1.to_csv(os.path.join(tmppathint,'bam1')+'.csv', sep=';', decimal=',',index=False)
+#bam1 = bam.loc[(bam["acctr"] == '01.1.1') & (bam["acctc"] == '01.1.1')]
+#print(bam1.shape)
+#bam1.to_csv(os.path.join(tmppathint,'bam1')+'.csv', sep=';', decimal=',',index=False)
 #print(years)
 #print(table.loc[(table['year']=='2018') & (table['nif']=='B96199807')]['11000'].values[0])
+bam.to_csv(os.path.join(tmppathint,'bam')+'.csv', sep=';', decimal=',',index=False)
