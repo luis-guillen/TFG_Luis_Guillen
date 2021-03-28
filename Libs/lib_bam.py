@@ -45,7 +45,7 @@ def import_bam(dat):
                         	    'idsabi' : object,
                                'nombre' : object,
                                'nif'    : object,
-                               'año'    : object,
+                               'año'    : int,
                                '11000'  : float, '11100' : float,'11200'  : float,'11300'  : float,'11400'  : float,
                                '11500'  : float,'11600'  : float,'11700'  : float,'12000'  : float,'12100'  : float,
                                '12200'  : float,'12210'  : float,'12220'  : float,'12230'  : float,'12240'  : float,
@@ -126,45 +126,103 @@ def import_map(file):
 
 def lookup_dat(table,year,nif,acctr,acctc):
 
+
    value1 = 0
    value2 = 0
    value_final = 0
    
    #Sales of merchandises & production
    if acctr == '02.1.0' and acctc=='01.1.1':
-      #12240	4. Finished goods
-      value1 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12240'].values[0]
-      #12250	5. By-products, waste & recovered materials
-      value2 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12250'].values[0]
-      #12300	III. Trade & other receivables
-      value3 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12300'].values[0]
-      #12400	IV. Current investments in group companies & associates
-      value4 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12400'].values[0]
-      #21100	I. Capital
-      value5 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21100'].values[0]
-      #21200	II. Share premium
-      value6 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21200'].values[0]
-      
-      value_final = value1 + value2 + value3 + value4 + value5 + value6
+      #40110	a) Sales
+      v_40110 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40110'].values[0]
+      #40120	b) Services provided
+      v_40120 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40120'].values[0]
+      #40200	2. Changes in inventories of finished goods & work in progress
+      v_40200 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40200'].values[0]
+      #40300	3. Work carried out by the company for assets
+      v_40300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40300'].values[0]
+      #40510	a) Non-trading & other operating income
+      v_40510 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40510'].values[0]
+      #40520	b) Operating grants taken to income
+      v_40520 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40520'].values[0]
+
+      value_final = v_40110 + v_40120 + v_40200 + v_40300 + v_40510 + v_40520
    
+   #Net taxes on sold merchandises, products & services (output tax minus subsidies)
    if acctr == '12.2.0' and acctc=='01.1.1':
       with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
-      # 40110	a) Sales
-      value1 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40100'].values[0]
-      # 40120	b) Services provided
-      value2 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40120'].values[0]
-      # 40130	c) Financial income of holding companies
-      value3 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40130'].values[0]
-      # 40510	a) Non-trading & other operating income
-      value4 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40510'].values[0]
-      # 40520	b) Operating grants taken to income
-      value5 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40520'].values[0]
-      # igic rate
-      value6 = igic.loc[(igic['year']==year)]['igic'].values[0]
+      # igic tax rate
+      v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
+      #40100	1. Revenue
+      v_40100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40100'].values[0]
+      #40510	a) Non-trading & other operating income
+      v_40510 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40510'].values[0]
+      #40520	b) Operating grants taken to income
+      v_40520 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40520'].values[0]
       
-      value_final = value6*(value1+value2+value3+value4) - value5
+      value_final = v_igic*(v_40100+v_40510) - v_40520
+
+   #Acquisition of goods & services, including financial services (net taxes included)
+   if acctr == '11.1.0' and acctc=='01.2.1':
+      with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
+      # igic tax rate
+      v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
+      #Intermediate consumption:   
+      #40410	a) Merchandise used
+      v_40410 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40410'].values[0]
+      #40420	b) Raw materials & other consumables used
+      v_40420 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40420'].values[0]
+      #40430	c) Subcontracted work
+      v_40430 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40430'].values[0]
+      #40440	4.d) Impairment of merchandise, raw materials & other supplies
+      v_40440 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40440'].values[0]
+      #40710	a) External services
+      v_40710 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40710'].values[0]
+      #40740	d) Other operating expenses
+      v_40740 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40740'].values[0]
+      #40750	e) Greenhouse gas emission expenses
+      v_40750 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40750'].values[0]
+      #12210	1. Goods for resale (changes)
+      v_12210 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12210'].values[0]
+      #12210	1. Goods for resale (previous year)
+      v_12210_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12210'].values[0]
+      #12200	2. Raw materials & other supplies (changes)
+      v_12220 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12220'].values[0]
+      #12200	2. Raw materials & other supplies (previous year)
+      v_12220_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12220'].values[0]
+      #12220	(-) Changes in II.1. Goods for resale  (balance)
+
+      value_final = - (v_40410 + v_40420 + v_40430 + v_40440 + v_40710 + v_40740 + v_40750 - (v_12210-v_12210_prev) - (v_12220-v_12220_prev)
+                    + (v_igic * (v_40410 + v_40420 + v_40430 + v_40440 + v_40710 - (v_12210-v_12210_prev) - (v_12220-v_12220_prev))))
+
+
+#-Supported and deductible indirect taxes (goods & services)
+   if acctr == '12.2.0' and acctc=='01.2.1':
+      with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
+      # igic tax rate
+      v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
+      #Intermediate consumption:   
+      #40410	a) Merchandise used
+      v_40410 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40410'].values[0]
+      #40420	b) Raw materials & other consumables used
+      v_40420 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40420'].values[0]
+      #40430	c) Subcontracted work
+      v_40430 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40430'].values[0]
+      #40440	4.d) Impairment of merchandise, raw materials & other supplies
+      v_40440 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40440'].values[0]
+      #40710	a) External services
+      v_40710 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40710'].values[0]
+      #12210	1. Goods for resale (changes)
+      v_12210 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12210'].values[0]
+      #12210_prev 	1. Goods for resale (previous year)
+      v_12210_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12210'].values[0]
+      #12220	2. Raw materials & other supplies (changes)
+      v_12220 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12220'].values[0]
+      #12220_prev	2. Raw materials & other supplies (previous year)
+      v_12220_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12220'].values[0]
       
-   #if acctr == '11.1.0' and acctc=='01.2.1':
+      
+      value_final = (v_igic * (v_40410 + v_40420 + v_40430 + v_40440 + v_40710 - (v_12210-v_12210_prev) - (v_12220-v_12220_prev)))
 
 
    return value_final

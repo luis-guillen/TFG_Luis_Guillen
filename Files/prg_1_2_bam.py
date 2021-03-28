@@ -48,7 +48,7 @@ def bam_etl_1(lista_data):
         with open(os.path.join(tmppathint,'data_'+dat+'.pkl'),'rb') as f:data = pickle.load(f)
         table=data[dat].copy()
         #years = pd.unique(table['year'])   
-        years = ['2010']
+        years = [2010]
         #nifs  = pd.unique(table['nif']) 
         nifs = ['A07411499']
         bam[dat]   = lbam.bam_generator(table,years,nifs,acctrs,acctcs)

@@ -58,6 +58,6 @@ def data_etl_2(lista_maps):
 
 def data_etl_3():
         igic=pd.read_csv(os.path.join(tmppathent,'igic.csv'), delimiter=';', encoding='latin1', decimal=',',
-                        dtype={'year'  : object, 
+                        dtype={'year'  : int, 
                                'igic'  : float})
         return igic
