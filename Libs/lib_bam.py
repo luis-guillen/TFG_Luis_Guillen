@@ -132,7 +132,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
    value_final = 0
    
    #Sales of merchandises & production
-   if acctr == '02.1.0' and acctc=='01.1.1':
+   if acctr == '02.1.0' and acctc=='01.1.0':
       #40110	a) Sales
       v_40110 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40110'].values[0]
       #40120	b) Services provided
@@ -147,9 +147,10 @@ def lookup_dat(table,year,nif,acctr,acctc):
       v_40520 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40520'].values[0]
 
       value_final = v_40110 + v_40120 + v_40200 + v_40300 + v_40510 + v_40520
-   
+
+
    #Net taxes on sold merchandises, products & services (output tax minus subsidies)
-   if acctr == '12.2.0' and acctc=='01.1.1':
+   if acctr == '12.2.0' and acctc=='01.1.0':
       with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
       # igic tax rate
       v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
@@ -161,6 +162,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
       v_40520 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40520'].values[0]
       
       value_final = v_igic*(v_40100+v_40510) - v_40520
+
 
    #Acquisition of goods & services, including financial services (net taxes included)
    if acctr == '11.1.0' and acctc=='01.2.1':
@@ -214,18 +216,531 @@ def lookup_dat(table,year,nif,acctr,acctc):
       v_40710 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40710'].values[0]
       #12210	1. Goods for resale (changes)
       v_12210 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12210'].values[0]
-      #12210_prev 	1. Goods for resale (previous year)
       v_12210_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12210'].values[0]
       #12220	2. Raw materials & other supplies (changes)
       v_12220 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12220'].values[0]
-      #12220_prev	2. Raw materials & other supplies (previous year)
       v_12220_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12220'].values[0]
-      
       
       value_final = (v_igic * (v_40410 + v_40420 + v_40430 + v_40440 + v_40710 - (v_12210-v_12210_prev) - (v_12220-v_12220_prev)))
 
 
+   #-Acquisition of fixed capital goods (net taxes included)
+   if acctr == '13.1.0' and acctc=='01.2.2':
+      with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
+      v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
+      #Acquisitions -  Disposal / derecognition of non-current assest (except financial instruments) (net balance)
+      #11100: I. Intangible assets
+      v_11100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11100'].values[0]
+      v_11100_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11100'].values[0]
+      #11200	II. Property, plant & equipment
+      v_11200 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11200'].values[0]
+      v_11200_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11200'].values[0]
+      #11300	III. Investment property
+      v_11300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11300'].values[0]
+      v_11300_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11300'].values[0]
+      #12100	I. Non-current assets held for sale
+      v_12100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12100'].values[0]
+      v_12100_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12100'].values[0]
+      #40800	8. Amortisation & depreciation
+      v_40800 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40800'].values[0]
+      #41110	11. Impairment & gains/(losses) on disposal of fixed assets
+      v_41110 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41110'].values[0]
+      #40300	3. Work carried out by the company for assets
+      v_40300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40300'].values[0]
+      #41120	b) Gains/(losses) on disposal & other
+      v_41120 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41120'].values[0]
+
+      value_final = (1+v_igic)* ((v_11100-v_11100_prev) + (v_11200-v_11200_prev) + (v_11300-v_11300_prev) + (v_12100-v_12100_prev)
+                     - v_40800 - v_41110 - v_40300) + v_igic * v_41120
+
+
+   #Net taxes on fixed capital goods (output tax minus subsidies & supported and deductible indirect taxes)
+   if acctr == '14.2.0' and acctc=='01.2.2':
+      with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
+      v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
+      #Acquisitions -  Disposal / derecognition of non-current assets (except financial instruments) (net balance)
+      #11100: I. Intangible assets
+      v_11100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11100'].values[0]
+      v_11100_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11100'].values[0]
+      #11200	II. Property, plant & equipment
+      v_11200 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11200'].values[0]
+      v_11200_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11200'].values[0]
+      #11300	III. Investment property
+      v_11300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11300'].values[0]
+      v_11300_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11300'].values[0]
+      #12100	I. Non-current assets held for sale
+      v_12100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12100'].values[0]
+      v_12100_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12100'].values[0]
+      #40800	8. Amortisation & depreciation
+      v_40800 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40800'].values[0]
+      #41110	11. Impairment & gains/(losses) on disposal of fixed assets
+      v_41110 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41110'].values[0]
+      #40300	3. Work carried out by the company for assets
+      v_40300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40300'].values[0]
+      #41120	b) Gains/(losses) on disposal & other
+      v_41120 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41120'].values[0]
+
+      value_final = v_igic * ((v_11100-v_11100_prev) + (v_11200-v_11200_prev) + (v_11300-v_11300_prev) + (v_12100-v_12100_prev)
+                     - v_40800 - v_41110 - v_40300)
+
+
+   #Cost of sold merchandises & Intermediate comsuption
+   if acctr == '01.2.1' and acctc=='01.2.3':
+      #40410-00	(-) 4.a) Merchandise used
+      v_40410 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40410'].values[0]
+      #40420   (-) 4.b) Consumption of raw materials & other consumables
+      v_40420 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40420'].values[0]      
+      #40430	(-) 4.c) Subcontracted work
+      v_40430 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40430'].values[0]      
+      #40440	(-) 4.d) Impairment of merchandise, raw materials & other supplies
+      v_40440 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40440'].values[0]      
+      #40710	(-) 7.a) External servicies
+      v_40710 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40710'].values[0]      
+      #40740	(-) 7.d) Other operating expenses
+      v_40740 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40740'].values[0]      
+      #40750	(-) 7.e) Greenhouse gas emission expenses
+      v_40750 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40750'].values[0]
+
+      value_final = -(v_40410 + v_40420 + v_40430 + v_40440 + v_40710 + v_40740 + v_40750)
+
+
+   #Cost of sold merchandises & Intermediate comsuption
+   if acctr == '01.2.3' and acctc=='02.1.0':
+      #40410-00	(-) 4.a) Merchandise used
+      v_40410 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40410'].values[0]
+      #40420   (-) 4.b) Consumption of raw materials & other consumables
+      v_40420 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40420'].values[0]      
+      #40430	(-) 4.c) Subcontracted work
+      v_40430 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40430'].values[0]      
+      #40440	(-) 4.d) Impairment of merchandise, raw materials & other supplies
+      v_40440 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40440'].values[0]      
+      #40710	(-) 7.a) External servicies
+      v_40710 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40710'].values[0]      
+      #40740	(-) 7.d) Other operating expenses
+      v_40740 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40740'].values[0]      
+      #40750	(-) 7.e) Greenhouse gas emission expenses
+      v_40750 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40750'].values[0]
+
+      value_final = -(v_40410 + v_40420 + v_40430 + v_40440 + v_40710 + v_40740 + v_40750)
+
+
+   #Fixed capital consumption
+   if acctr == '09.2.0' and acctc=='02.1.0':
+      #40800	(-) 8. Amortisation & depreciation
+      v_40800 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40800'].values[0]      
+      #41110	(+/-) 11.a) Impairment & losses
+      v_41110 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41110'].values[0]      
+
+      value_final = -(v_40800 + v_41110)
+
+
+   #Wages and Salaries & Compensations
+   if acctr == '04.1.1' and acctc=='03.1.0':
+      #40610	(-) 6.a) Salaries & wages
+      v_40610 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40610'].values[0]      
+
+      value_final = -v_40610
+
+
+   #Employer social security
+   if acctr == '04.1.2' and acctc=='03.1.0':
+      #40620	(-) 6.b) Employee benefits expense (hypothesis: all for Social Security)
+      v_40620 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40620'].values[0]      
+
+      value_final = -v_40620
+
+
+   #Social benefits
+   if acctr == '04.1.3' and acctc=='03.1.0':
+      #40630	(-) 6.c) Provisions
+      v_40630 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40630'].values[0]      
+
+      value_final = -v_40630
+
+
+   #Other production taxes
+   if acctr == '04.2.0' and acctc=='03.1.0':
+      #40720	(-) 7.b) Taxes (hypothesis: on production)
+      v_40720 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40720'].values[0]      
+
+      value_final = -v_40720
+
+
+   #Wages and Salaries & Compensations
+   if acctr == '11.1.0' and acctc=='04.1.1':
+      #40610	(-) 6.a) Salaries & wages
+      v_40610 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40610'].values[0]      
+
+      value_final = -v_40610
+
+
+   #Employer Social Security
+   if acctr == '12.1.0' and acctc=='04.1.2':
+      #40620	(-) 6.b) Employee benefits expense (hypothesis: all for Social Security)
+      v_40620 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40620'].values[0]      
+
+      value_final = -v_40620
+
+
+   #Social benefits
+   if acctr == '11.1.0' and acctc=='04.1.3':
+      #40630	(-) 6.c) Provisions
+      v_40630 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40630'].values[0]      
+
+      value_final = -v_40630
+
+
+   #Other Production Taxes
+   if acctr == '12.1.0' and acctc=='04.2.0':
+      #40720	(-) 7.b) Taxes (hypothesis: on production)
+      v_40720 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40720'].values[0]      
+
+      value_final = -v_40720
+
+
+   #Property income paid (taxes included)
+   if acctr == '11.1.0' and acctc=='05.1.0':
+      #41500	15. Finance expenses
+      v_41500 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41500'].values[0]      
+      #Supported VAT on property income
+      vat_propinc = 0
+
+      value_final = -(v_41500 + vat_propinc)
+
+
+   # -Supported and deductible indirect taxes (property income)
+   if acctr == '12.1.0' and acctc=='05.1.0':
+      #VAT on property income
+      vat_propinc = 0
+      #Supported VAT on property income
+      vat_propinc_sup = 0
+
+      value_final = -(vat_propinc + vat_propinc_sup)
+
+
+   # Current non-repayable paid transfers
+   if acctr == '11.1.0' and acctc=='06.1.0':
+      #41300	13. Other results
+      v_41300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41300'].values[0]  
+
+      value_final = -v_41300
+
+
+   # Current non-repayable paid transfers (included income tax & fines and penalties)
+   if acctr == '12.1.0' and acctc=='06.1.0':
+      #41900	(+/-) 20. Income tax
+      v_41900 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41900'].values[0]  
+
+      value_final = -v_41900
+
+
+   # Dividends paid
+   if acctr == '11.1.0' and acctc=='07.1.0':
+      #52013	(-) Dividends paid
+      v_52013 = table.loc[(table['year']==year)  & (table['nif']==nif)]['52013'].values[0]  
+
+      value_final = -v_52013
+
+
+   # Adjustments & Operating losses
+   if acctr == '11.1.0' and acctc=='08.2.0':
+      #40730	7.c) (+/-) Losses, impairment & changes in trade provisions
+      v_40730 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40730'].values[0]  
+
+      value_final = -v_40730
+
+
+   # Adjustments & Non-operating losses
+   if acctr == '13.1.0' and acctc=='08.2.0':
+      #41810	(+/-) 18.a) Impairment (losses & reversal) (in financial instruments non operating)
+      v_41810 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41810'].values[0]  
+      #50080	(-) VIII. Measurement of financial instruments
+      v_50080 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50080'].values[0]  
+      #50090	(-) IX. Cash flow hedges
+      v_50090 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50090'].values[0]  
+      #50110	(-) XI. Non current assets held for sale & associated liabilities
+      v_50110 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50110'].values[0]  
+      #50120	(-) XII. Conversion differences
+      v_50120 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50120'].values[0]  
+
+      value_final = v_41810 + v_50080 + v_50090 + v_50110 + v_50120
+
+
+   # Negative tax adjustments
+   if acctr == '14.1.0' and acctc=='08.2.0':
+      #50130	(-) XIII. Tax effect (income & expense recognised directly in equity)
+      v_50130 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50130'].values[0]  
+
+      value_final = v_50130
+
+
+   # Discontinued operations, net of income tax
+   if acctr == '09.3.0' and acctc=='08.3.0':
+      #42000	21. Profit / (loss) from discontinued operations, net of income tax
+      v_42000 = table.loc[(table['year']==year)  & (table['nif']==nif)]['42000'].values[0]  
+
+      value_final = v_42000
+
+
+   # Change in inventories (production)
+   if acctr == '01.1.0' and acctc=='09.1.0':
+      #40200	(+/-) 2. Changes in inventories of finished goods & work in progress
+      v_40200 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40200'].values[0]  
+
+      value_final = v_40200
+
+
+   # Change in inventories (goods & services acquired)
+   if acctr == '01.2.1' and acctc=='09.1.0':
+      #12210	1. Goods for resale
+      v_12210 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12210'].values[0]  
+      v_12210_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12210'].values[0]  
+      #12220	2. Raw materials & other supplies
+      v_12220 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12220'].values[0]  
+      v_12220_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12220'].values[0]  
+
+      value_final = (v_12210 - v_12210_prev) + (v_12220 - v_12220_prev)
+
+
+   #  Gross fixed capital formation (self-buildt) 
+   if acctr == '01.1.0' and acctc=='09.2.0':
+      #40300	(+) 3. Work carried out by the company for assets
+      v_40300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40300'].values[0]  
+
+      value_final = v_40300
+
+
+   # Gross fixed capital formation (acquired) 
+   if acctr == '01.2.2' and acctc=='09.2.0':
+      #40300	(-) 3 .Work carried out by the company
+      v_40300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40300'].values[0]  
+      #11100	I. Intangible assets
+      v_11100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11100'].values[0]  
+      v_11100_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11100'].values[0]  
+      #11200	II. Property, plant & equipment
+      v_11200 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11200'].values[0]  
+      v_11200_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11200'].values[0]  
+      #11300	III. Investment property
+      v_11300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11300'].values[0]  
+      v_11300_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11300'].values[0]  
+      #12100	I. Non-current assets held for sale
+      v_12100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12100'].values[0]  
+      v_12100_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12100'].values[0]  
+      #40800	(-) 8. Amortisation & depreciation
+      v_40800 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40800'].values[0]  
+      #41110	(+/-) 11.a) Impairment & losses
+      v_41110 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41110'].values[0]  
+
+      value_final = -v_40300 + (v_11100-v_11100_prev) + (v_11200-v_11200_prev) + (v_11300-v_11300_prev) + (v_12100-v_12100_prev) -  v_40800 - v_41110
+
+
+   #Change in financial assets (operating)
+   if acctr == '10.1.0' and acctc=='09.4.0':
+      #11600	VI. Deferred tax assets
+      v_11600 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11600'].values[0]  
+      v_11600_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11600'].values[0]  
+      #11700	VII. Non-current trade & other receivables
+      v_11700 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11700'].values[0]  
+      v_11700_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11700'].values[0]  
+      #12260	6. Advances to suppliers
+      v_12260 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12260'].values[0]  
+      v_12260_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12260'].values[0]  
+      #12300	III. Trade & other receivables
+      v_12300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12300'].values[0]  
+      v_12300_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12300'].values[0]  
+      #12600	VI. Prepayments for current assets
+      v_12600 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12600'].values[0]  
+      v_12600_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12600'].values[0]  
+
+      value_final = (v_11600-v_11600_prev) + (v_11700-v_11700_prev) + (v_12260-v_12260_prev) + (v_12300-v_12300_prev) + (v_12600-v_12600_prev)
+
+
+   #Change in financial assets (non-operating)
+   if acctr == '10.2.0' and acctc=='09.4.0':
+
+      #11400	IV. Non-current financial investments in group companies & associates
+      v_11400 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11400'].values[0]  
+      v_11400_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11400'].values[0]  
+      #11500	V. Non-current financial investments
+      v_11500 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11500'].values[0]  
+      v_11500_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11500'].values[0]  
+      #12400	IV. Current investments in group companies & associates
+      v_12400 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12400'].values[0]  
+      v_12400_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12400'].values[0]  
+      #12500	V. Current investments
+      v_12500 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12500'].values[0]  
+      v_12500_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12500'].values[0]  
+      #12700	VII Cash & cash equivalents
+      v_12700 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12700'].values[0]  
+      v_12700_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12700'].values[0]  
+
+      value_final = (v_11400-v_11400_prev) + (v_11500-v_11500_prev) + (v_12400-v_12400_prev) + (v_12500-v_12500_prev) + (v_12700-v_12700_prev)
+
+
+   # Net borrowing (operating)
+   if acctr == '09.4.0' and acctc=='10.1.0':
+      #31100	I. Non-current provisions
+      v_31100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['31100'].values[0]  
+      v_31100_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['31100'].values[0]  
+      #31400	IV. Deferred tax liabilities
+      v_31400 = table.loc[(table['year']==year)  & (table['nif']==nif)]['31400'].values[0]  
+      v_31400_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['31400'].values[0]  
+      #31500	V. Non-current accruals
+      v_31500 = table.loc[(table['year']==year)  & (table['nif']==nif)]['31500'].values[0]  
+      v_31500_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['31500'].values[0]  
+      #31600	VI. Non-current trade & other payables
+      v_31600 = table.loc[(table['year']==year)  & (table['nif']==nif)]['31600'].values[0]  
+      v_31600_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['31600'].values[0]  
+      #32200	II. Current provisions
+      v_32200 = table.loc[(table['year']==year)  & (table['nif']==nif)]['32200'].values[0]  
+      v_32200_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['32200'].values[0]  
+      #32500	V. Trade & other payables
+      v_32500 = table.loc[(table['year']==year)  & (table['nif']==nif)]['32500'].values[0]  
+      v_32500_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['32500'].values[0]  
+      #32600	VI. Current accruals
+      v_32600 = table.loc[(table['year']==year)  & (table['nif']==nif)]['32600'].values[0]  
+      v_32600_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['32600'].values[0]  
+
+      value_final = (v_31100-v_31100_prev) + (v_31400-v_31400_prev) + (v_31500-v_31500_prev) + (v_31600-v_31600_prev) + (v_32200-v_32200_prev) + (v_32500-v_32500_prev) + (v_32600-v_32600_prev)
+   
+
+   # Net borrowing (non-operating)
+   if acctr == '09.4.0' and acctc=='10.2.0':
+      #31200	II. Non-current payables
+      v_31200 = table.loc[(table['year']==year)  & (table['nif']==nif)]['31200'].values[0]  
+      v_31200_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['31200'].values[0]  
+      #31300	III. Non-current payables, group companies & associates
+      v_31300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['31300'].values[0]  
+      v_31300_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['31300'].values[0]  
+      #31700	VII. Non-current debts with special characteristics
+      v_31700 = table.loc[(table['year']==year)  & (table['nif']==nif)]['31700'].values[0]  
+      v_31700_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['31700'].values[0]  
+      #32100	I. Liabilities associated with non-current assets held for sale
+      v_32100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['32100'].values[0]  
+      v_32100_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['32100'].values[0]  
+      #32300	III. Current payables
+      v_32300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['32300'].values[0]  
+      v_32300_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['32300'].values[0]  
+      #32400	IV. Current payables, group & associated companies
+      v_32400 = table.loc[(table['year']==year)  & (table['nif']==nif)]['32400'].values[0]  
+      v_32400_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['32400'].values[0]  
+      #32700	VII. Current debts with special characteristics
+      v_32700 = table.loc[(table['year']==year)  & (table['nif']==nif)]['32700'].values[0]  
+      v_32700_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['32700'].values[0]  
+
+      value_final = (v_31200-v_31200_prev) + (v_31300-v_31300_prev) + (v_31700-v_31700_prev) + (v_32100-v_32100_prev) + (v_32300-v_32300_prev) + (v_32400-v_32400_prev) + (v_32700-v_32700_prev)
+
+
+   # Sales of merchandises, finished goods & services (net taxes included)
+   if acctr == '01.1.0' and acctc=='11.1.0':
+      with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
+      # igic tax rate
+      v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
+      #40110	a) Sales
+      v_40110 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40110'].values[0]
+      #40120	b) Services provided
+      v_40120 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40120'].values[0]
+      #40510	a) Non-trading & other operating income
+      v_40510 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40510'].values[0]      
+      #40100	1. Revenue
+      v_40100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40100'].values[0]
+      
+      value_final = v_igic*(v_40100+v_40510) + v_40110 + v_40120 + v_40510
+
+
+   # Adjustments & operating gains
+   if acctr == '08.2.0' and acctc=='11.1.0':
+      #41700	(+/-) 17. Exchange gains / (losses)
+      v_41700 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41700'].values[0]
+
+      value_final = v_41700
+
+
+   # Capital contribution (capital & reserves)
+   if acctr == '07.1.0' and acctc=='13.1.0':
+      #21100	I. Capital
+      v_21100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21100'].values[0]  
+      v_21100_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['21100'].values[0]  
+      #21400	IV. (Own shares & equity holdings)
+      v_21400 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21400'].values[0]  
+      v_21400_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['21400'].values[0]  
+      #21200	II. Share premium
+      v_21200 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21200'].values[0]  
+      v_21200_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['21200'].values[0]  
+      #21300	III. Reserves
+      v_21300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21300'].values[0]  
+      v_21300_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['21300'].values[0]  
+      #21500	V. Prior periods'  profit & losses
+      v_21500 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21500'].values[0]  
+      v_21500_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['21500'].values[0]  
+      #21600	VI. Other equity holder contributions
+      v_21600 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21600'].values[0]  
+      v_21600_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['21600'].values[0]  
+      #21700	VII. Profit/(loss) for the period
+      v_21700 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21700'].values[0]  
+      v_21700_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['21700'].values[0]  
+      #21800	VIII. (Interim dividend)
+      v_21800 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21800'].values[0]  
+      v_21800_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['21800'].values[0]  
+      #21900	IX. Other equity instruments
+      v_21900 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21900'].values[0]  
+      v_21900_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['21900'].values[0]  
+      #21700	VII. Profit/(loss) for the period
+      v_21700 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21700'].values[0]        
+      #52013	(-) Dividends paid
+      v_52013 = table.loc[(table['year']==year)  & (table['nif']==nif)]['52013'].values[0]  
+
+      value_final = (v_21200-v_21200_prev) + (v_21300-v_21300_prev) + (v_21500-v_21500_prev) + (v_21600-v_21600_prev) + (v_21700-v_21700_prev) + (v_21800-v_21800_prev) + (v_21900-v_21900_prev) + (v_21100-v_21100_prev) + (v_21400-v_21400_prev) - v_21700 -v_52013
+
+
+   # Adjustments & non-operating gains
+   if acctr == '08.2.0' and acctc=='13.1.0':
+      #50010	I. Measurement of financial instruments
+      v_50010 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50010'].values[0]        
+      #50020	II. Cash flow hedges
+      v_50020 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50020'].values[0]  
+      #50040	IV. Actuarial gains & losses & other adjustments
+      v_50040 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50040'].values[0]  
+      #50050	V. Non current assets held for sale & associated liabilities
+      v_50050 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50050'].values[0]
+      #50060	VI. Conversion differences
+      v_50060 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50060'].values[0]  
+      #41000	10. Provision surpluses
+      v_41000 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41000'].values[0]  
+      #41120	b) Gains/(losses) on disposal & other
+      v_41120 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41120'].values[0]  
+      #41820	b) Gains/(losses) on disposal & other
+      v_41820 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41820'].values[0]  
+      #41200	12. Negative goodwill on business combinations
+      v_41200 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41200'].values[0]        
+      #41600	16. Change in fair value of financial instruments
+      v_41600 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41600'].values[0]  
+
+      value_final = v_50010 + v_50020 + v_50040 + v_50050 + v_50060 + v_41000  + v_41120 + v_41820 + v_41200 + v_41600
+
+
+   # Non-current non-repayable transfers received
+   if acctr == '08.1.0' and acctc=='14.1.0':
+      #50030	III. Grants, donations & bequests received 
+      v_50030 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50030'].values[0]  
+      #50100	X. Grants, donations & bequests received
+      v_50100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50100'].values[0]  
+      #40900	9. Non-financial & other capital grants
+      v_40900 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40900'].values[0]  
+           
+      value_final = v_50030 + v_50100 + v_40900
+
+
+   # Positive tax adjustments
+   if acctr == '08.2.0' and acctc=='14.1.0':
+      #50130	XIII. Tax effect
+      v_50130 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50130'].values[0]        
+
+      value_final = v_50130
+
+
    return value_final
+
 
 def bam_generator(table,years,nifs,acctrs,acctcs):
    empty_list = []
@@ -238,4 +753,13 @@ def bam_generator(table,years,nifs,acctrs,acctcs):
    result = pd.DataFrame(empty_list,columns=['year','nif','acctr','acctc','value'])	
    return result
 
+def bam_completion(table,years,nifs):
+   for year in years:
+      for nif in nifs:
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='03.1.0') & (table['acctc']=='02.1.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='02.1.0') & (table['acctc']=='01.1.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='01.2.3') & (table['acctc']=='02.1.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.2.0') & (table['acctc']=='02.1.0')), ['value']].values[0]
 
+   #result = pd.DataFrame(empty_list,columns=['year','nif','acctr','acctc','value'])	
+   return table
