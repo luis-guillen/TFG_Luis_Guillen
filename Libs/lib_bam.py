@@ -150,7 +150,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Net taxes on sold merchandises, products & services (output tax minus subsidies)
-   if acctr == '12.2.0' and acctc=='01.1.0':
+   elif acctr == '12.2.0' and acctc=='01.1.0':
       with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
       # igic tax rate
       v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
@@ -165,7 +165,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Acquisition of goods & services, including financial services (net taxes included)
-   if acctr == '11.1.0' and acctc=='01.2.1':
+   elif acctr == '11.1.0' and acctc=='01.2.1':
       with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
       # igic tax rate
       v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
@@ -199,7 +199,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
 #-Supported and deductible indirect taxes (goods & services)
-   if acctr == '12.2.0' and acctc=='01.2.1':
+   elif acctr == '12.2.0' and acctc=='01.2.1':
       with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
       # igic tax rate
       v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
@@ -225,7 +225,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #-Acquisition of fixed capital goods (net taxes included)
-   if acctr == '13.1.0' and acctc=='01.2.2':
+   elif acctr == '13.1.0' and acctc=='01.2.2':
       with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
       v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
       #Acquisitions -  Disposal / derecognition of non-current assest (except financial instruments) (net balance)
@@ -255,7 +255,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Net taxes on fixed capital goods (output tax minus subsidies & supported and deductible indirect taxes)
-   if acctr == '14.2.0' and acctc=='01.2.2':
+   elif acctr == '14.2.0' and acctc=='01.2.2':
       with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
       v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
       #Acquisitions -  Disposal / derecognition of non-current assets (except financial instruments) (net balance)
@@ -285,7 +285,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Cost of sold merchandises & Intermediate comsuption
-   if acctr == '01.2.1' and acctc=='01.2.3':
+   elif acctr == '01.2.1' and acctc=='01.2.3':
       #40410-00	(-) 4.a) Merchandise used
       v_40410 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40410'].values[0]
       #40420   (-) 4.b) Consumption of raw materials & other consumables
@@ -305,7 +305,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Cost of sold merchandises & Intermediate comsuption
-   if acctr == '01.2.3' and acctc=='02.1.0':
+   elif acctr == '01.2.3' and acctc=='02.1.0':
       #40410-00	(-) 4.a) Merchandise used
       v_40410 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40410'].values[0]
       #40420   (-) 4.b) Consumption of raw materials & other consumables
@@ -325,7 +325,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Fixed capital consumption
-   if acctr == '09.2.0' and acctc=='02.1.0':
+   elif acctr == '09.2.0' and acctc=='02.1.0':
       #40800	(-) 8. Amortisation & depreciation
       v_40800 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40800'].values[0]      
       #41110	(+/-) 11.a) Impairment & losses
@@ -335,7 +335,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Wages and Salaries & Compensations
-   if acctr == '04.1.1' and acctc=='03.1.0':
+   elif acctr == '04.1.1' and acctc=='03.1.0':
       #40610	(-) 6.a) Salaries & wages
       v_40610 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40610'].values[0]      
 
@@ -343,7 +343,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Employer social security
-   if acctr == '04.1.2' and acctc=='03.1.0':
+   elif acctr == '04.1.2' and acctc=='03.1.0':
       #40620	(-) 6.b) Employee benefits expense (hypothesis: all for Social Security)
       v_40620 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40620'].values[0]      
 
@@ -351,7 +351,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Social benefits
-   if acctr == '04.1.3' and acctc=='03.1.0':
+   elif acctr == '04.1.3' and acctc=='03.1.0':
       #40630	(-) 6.c) Provisions
       v_40630 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40630'].values[0]      
 
@@ -359,7 +359,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Other production taxes
-   if acctr == '04.2.0' and acctc=='03.1.0':
+   elif acctr == '04.2.0' and acctc=='03.1.0':
       #40720	(-) 7.b) Taxes (hypothesis: on production)
       v_40720 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40720'].values[0]      
 
@@ -367,7 +367,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Wages and Salaries & Compensations
-   if acctr == '11.1.0' and acctc=='04.1.1':
+   elif acctr == '11.1.0' and acctc=='04.1.1':
       #40610	(-) 6.a) Salaries & wages
       v_40610 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40610'].values[0]      
 
@@ -375,7 +375,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Employer Social Security
-   if acctr == '12.1.0' and acctc=='04.1.2':
+   elif acctr == '12.1.0' and acctc=='04.1.2':
       #40620	(-) 6.b) Employee benefits expense (hypothesis: all for Social Security)
       v_40620 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40620'].values[0]      
 
@@ -383,7 +383,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Social benefits
-   if acctr == '11.1.0' and acctc=='04.1.3':
+   elif acctr == '11.1.0' and acctc=='04.1.3':
       #40630	(-) 6.c) Provisions
       v_40630 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40630'].values[0]      
 
@@ -391,7 +391,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Other Production Taxes
-   if acctr == '12.1.0' and acctc=='04.2.0':
+   elif acctr == '12.1.0' and acctc=='04.2.0':
       #40720	(-) 7.b) Taxes (hypothesis: on production)
       v_40720 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40720'].values[0]      
 
@@ -399,7 +399,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Property income paid (taxes included)
-   if acctr == '11.1.0' and acctc=='05.1.0':
+   elif acctr == '11.1.0' and acctc=='05.1.0':
       #41500	15. Finance expenses
       v_41500 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41500'].values[0]      
       #Supported VAT on property income
@@ -409,7 +409,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # -Supported and deductible indirect taxes (property income)
-   if acctr == '12.1.0' and acctc=='05.1.0':
+   elif acctr == '12.1.0' and acctc=='05.1.0':
       #VAT on property income
       vat_propinc = 0
       #Supported VAT on property income
@@ -419,7 +419,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Current non-repayable paid transfers
-   if acctr == '11.1.0' and acctc=='06.1.0':
+   elif acctr == '11.1.0' and acctc=='06.1.0':
       #41300	13. Other results
       v_41300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41300'].values[0]  
 
@@ -427,7 +427,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Current non-repayable paid transfers (included income tax & fines and penalties)
-   if acctr == '12.1.0' and acctc=='06.1.0':
+   elif acctr == '12.1.0' and acctc=='06.1.0':
       #41900	(+/-) 20. Income tax
       v_41900 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41900'].values[0]  
 
@@ -435,7 +435,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Dividends paid
-   if acctr == '11.1.0' and acctc=='07.1.0':
+   elif acctr == '11.1.0' and acctc=='07.1.0':
       #52013	(-) Dividends paid
       v_52013 = table.loc[(table['year']==year)  & (table['nif']==nif)]['52013'].values[0]  
 
@@ -443,7 +443,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Adjustments & Operating losses
-   if acctr == '11.1.0' and acctc=='08.2.0':
+   elif acctr == '11.1.0' and acctc=='08.2.0':
       #40730	7.c) (+/-) Losses, impairment & changes in trade provisions
       v_40730 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40730'].values[0]  
 
@@ -451,7 +451,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Adjustments & Non-operating losses
-   if acctr == '13.1.0' and acctc=='08.2.0':
+   elif acctr == '13.1.0' and acctc=='08.2.0':
       #41810	(+/-) 18.a) Impairment (losses & reversal) (in financial instruments non operating)
       v_41810 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41810'].values[0]  
       #50080	(-) VIII. Measurement of financial instruments
@@ -467,7 +467,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Negative tax adjustments
-   if acctr == '14.1.0' and acctc=='08.2.0':
+   elif acctr == '14.1.0' and acctc=='08.2.0':
       #50130	(-) XIII. Tax effect (income & expense recognised directly in equity)
       v_50130 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50130'].values[0]  
 
@@ -475,7 +475,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Discontinued operations, net of income tax
-   if acctr == '09.3.0' and acctc=='08.3.0':
+   elif acctr == '09.3.0' and acctc=='08.3.0':
       #42000	21. Profit / (loss) from discontinued operations, net of income tax
       v_42000 = table.loc[(table['year']==year)  & (table['nif']==nif)]['42000'].values[0]  
 
@@ -483,7 +483,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Change in inventories (production)
-   if acctr == '01.1.0' and acctc=='09.1.0':
+   elif acctr == '01.1.0' and acctc=='09.1.0':
       #40200	(+/-) 2. Changes in inventories of finished goods & work in progress
       v_40200 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40200'].values[0]  
 
@@ -491,7 +491,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Change in inventories (goods & services acquired)
-   if acctr == '01.2.1' and acctc=='09.1.0':
+   elif acctr == '01.2.1' and acctc=='09.1.0':
       #12210	1. Goods for resale
       v_12210 = table.loc[(table['year']==year)  & (table['nif']==nif)]['12210'].values[0]  
       v_12210_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['12210'].values[0]  
@@ -503,7 +503,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #  Gross fixed capital formation (self-buildt) 
-   if acctr == '01.1.0' and acctc=='09.2.0':
+   elif acctr == '01.1.0' and acctc=='09.2.0':
       #40300	(+) 3. Work carried out by the company for assets
       v_40300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40300'].values[0]  
 
@@ -511,7 +511,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Gross fixed capital formation (acquired) 
-   if acctr == '01.2.2' and acctc=='09.2.0':
+   elif acctr == '01.2.2' and acctc=='09.2.0':
       #40300	(-) 3 .Work carried out by the company
       v_40300 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40300'].values[0]  
       #11100	I. Intangible assets
@@ -535,7 +535,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Change in financial assets (operating)
-   if acctr == '10.1.0' and acctc=='09.4.0':
+   elif acctr == '10.1.0' and acctc=='09.3.0':
       #11600	VI. Deferred tax assets
       v_11600 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11600'].values[0]  
       v_11600_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['11600'].values[0]  
@@ -556,7 +556,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    #Change in financial assets (non-operating)
-   if acctr == '10.2.0' and acctc=='09.4.0':
+   elif acctr == '10.2.0' and acctc=='09.3.0':
 
       #11400	IV. Non-current financial investments in group companies & associates
       v_11400 = table.loc[(table['year']==year)  & (table['nif']==nif)]['11400'].values[0]  
@@ -578,7 +578,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Net borrowing (operating)
-   if acctr == '09.4.0' and acctc=='10.1.0':
+   elif acctr == '09.3.0' and acctc=='10.1.0':
       #31100	I. Non-current provisions
       v_31100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['31100'].values[0]  
       v_31100_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['31100'].values[0]  
@@ -605,7 +605,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
    
 
    # Net borrowing (non-operating)
-   if acctr == '09.4.0' and acctc=='10.2.0':
+   elif acctr == '09.3.0' and acctc=='10.2.0':
       #31200	II. Non-current payables
       v_31200 = table.loc[(table['year']==year)  & (table['nif']==nif)]['31200'].values[0]  
       v_31200_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['31200'].values[0]  
@@ -632,7 +632,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Sales of merchandises, finished goods & services (net taxes included)
-   if acctr == '01.1.0' and acctc=='11.1.0':
+   elif acctr == '01.1.0' and acctc=='11.1.0':
       with open(os.path.join(tmppathint,'igic.pkl'),'rb') as f: igic = pickle.load(f)
       # igic tax rate
       v_igic = igic.loc[(igic['year']==year)]['igic'].values[0]
@@ -647,9 +647,22 @@ def lookup_dat(table,year,nif,acctr,acctc):
       
       value_final = v_igic*(v_40100+v_40510) + v_40110 + v_40120 + v_40510
 
+   # Property income received (incl. financial investments) (net taxes included)
+   elif acctr == '05.1.0' and acctc=='11.1.0':
+      #41400	14. Finance income
+      v_41400 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41400'].values[0]
+      #40130	c) Financial income of holding companies
+      v_40130 = table.loc[(table['year']==year)  & (table['nif']==nif)]['40130'].values[0]      
+      #42100	19. Other finance income & expenses
+      v_42100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['42100'].values[0]      
+      #Supported VAT on property income
+      vat_propinc = 0
+
+      value_final = v_41400 + v_40130 + v_42100 + vat_propinc
+      
 
    # Adjustments & operating gains
-   if acctr == '08.2.0' and acctc=='11.1.0':
+   elif acctr == '08.2.0' and acctc=='11.1.0':
       #41700	(+/-) 17. Exchange gains / (losses)
       v_41700 = table.loc[(table['year']==year)  & (table['nif']==nif)]['41700'].values[0]
 
@@ -657,7 +670,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Capital contribution (capital & reserves)
-   if acctr == '07.1.0' and acctc=='13.1.0':
+   elif acctr == '07.1.0' and acctc=='13.1.0':
       #21100	I. Capital
       v_21100 = table.loc[(table['year']==year)  & (table['nif']==nif)]['21100'].values[0]  
       v_21100_prev = table.loc[(table['year']==year-1)  & (table['nif']==nif)]['21100'].values[0]  
@@ -694,7 +707,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Adjustments & non-operating gains
-   if acctr == '08.2.0' and acctc=='13.1.0':
+   elif acctr == '08.2.0' and acctc=='13.1.0':
       #50010	I. Measurement of financial instruments
       v_50010 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50010'].values[0]        
       #50020	II. Cash flow hedges
@@ -720,7 +733,7 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Non-current non-repayable transfers received
-   if acctr == '08.1.0' and acctc=='14.1.0':
+   elif acctr == '08.1.0' and acctc=='14.1.0':
       #50030	III. Grants, donations & bequests received 
       v_50030 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50030'].values[0]  
       #50100	X. Grants, donations & bequests received
@@ -732,13 +745,14 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
    # Positive tax adjustments
-   if acctr == '08.2.0' and acctc=='14.1.0':
+   elif acctr == '08.2.0' and acctc=='14.1.0':
       #50130	XIII. Tax effect
       v_50130 = table.loc[(table['year']==year)  & (table['nif']==nif)]['50130'].values[0]        
 
       value_final = v_50130
 
-
+   else: value_final = 0
+   
    return value_final
 
 
@@ -761,5 +775,103 @@ def bam_completion(table,years,nifs):
          table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='01.2.3') & (table['acctc']=='02.1.0')), ['value']].values[0] -   \
          table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.2.0') & (table['acctc']=='02.1.0')), ['value']].values[0]
 
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.3.0') & (table['acctc']=='03.1.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='03.1.0') & (table['acctc']=='02.1.0')), ['value']].values[0] -    \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.1.1') & (table['acctc']=='03.1.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.1.2') & (table['acctc']=='03.1.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.1.3') & (table['acctc']=='03.1.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.2.0') & (table['acctc']=='03.1.0')), ['value']].values[0]
+         
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='05.1.0') & (table['acctc']=='04.3.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.3.0') & (table['acctc']=='03.1.0')), ['value']].values[0]
+
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='06.1.0') & (table['acctc']=='05.1.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='05.1.0') & (table['acctc']=='04.3.0')), ['value']].values[0] +   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='05.1.0') & (table['acctc']=='11.1.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='05.1.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='05.1.0')), ['value']].values[0]
+
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='07.1.0') & (table['acctc']=='06.1.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='06.1.0') & (table['acctc']=='05.1.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='06.1.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='06.1.0')), ['value']].values[0]
+
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='07.1.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='07.1.0') & (table['acctc']=='06.1.0')), ['value']].values[0] +   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='07.1.0') & (table['acctc']=='13.1.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='07.1.0')), ['value']].values[0]
+
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='08.1.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='07.1.0')), ['value']].values[0] +   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='13.1.0')), ['value']].values[0] +   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='14.1.0')), ['value']].values[0] 
+
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.3.0') & (table['acctc']=='08.2.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='08.1.0')), ['value']].values[0] +   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='11.1.0')), ['value']].values[0] +   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='13.1.0')), ['value']].values[0] +   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='14.1.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='13.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0] -   \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='14.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0]
+
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.1.0') & (table['acctc']=='08.3.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='01.2.1') & (table['acctc']=='09.1.0')), ['value']].values[0]
+   
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.2.0') & (table['acctc']=='08.3.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='01.1.0') & (table['acctc']=='09.2.0')), ['value']].values[0]  +  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='01.2.2') & (table['acctc']=='09.2.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.2.0') & (table['acctc']=='02.1.0')), ['value']].values[0]
+   
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.3.0') & (table['acctc']=='08.3.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.3.0') & (table['acctc']=='08.2.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.1.0') & (table['acctc']=='08.3.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.2.0') & (table['acctc']=='08.3.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.3.0') & (table['acctc']=='08.3.0')), ['value']].values[0]
+
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='15.1.0') & (table['acctc']=='10.1.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='10.1.0') & (table['acctc']=='09.3.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.3.0') & (table['acctc']=='10.1.0')), ['value']].values[0]
+
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='15.1.0') & (table['acctc']=='10.2.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='10.2.0') & (table['acctc']=='09.3.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.3.0') & (table['acctc']=='10.2.0')), ['value']].values[0]
+
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='15.1.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='01.1.0') & (table['acctc']=='11.1.0')), ['value']].values[0]  +  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='05.1.0') & (table['acctc']=='11.1.0')), ['value']].values[0]  +  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='11.1.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='01.2.1')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='04.1.1')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='04.1.3')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='05.1.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='06.1.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='07.1.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0]
+         
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='15.1.0')), ['value']] =          -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='01.1.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='01.2.1')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='04.1.2')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='04.2.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='05.1.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='06.1.0')), ['value']].values[0]
+
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='13.1.0') & (table['acctc']=='15.1.0')), ['value']] =          -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='07.1.0') & (table['acctc']=='13.1.0')), ['value']].values[0]  +  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='13.1.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='13.1.0') & (table['acctc']=='01.2.2')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='13.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0]
+
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='14.1.0') & (table['acctc']=='15.1.0')), ['value']] =             \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='14.1.0')), ['value']].values[0]  +  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='14.1.0')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='14.1.0') & (table['acctc']=='01.2.2')), ['value']].values[0]  -  \
+         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='14.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0]
+
+
+
    #result = pd.DataFrame(empty_list,columns=['year','nif','acctr','acctc','value'])	
+
+
    return table
