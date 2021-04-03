@@ -6,6 +6,7 @@ import importlib
 import numpy as np
 import pickle
 import os
+import time
 from Libs import lib_cmlp as cmlp
 
 
@@ -757,9 +758,13 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
 def bam_generator(table,years,nifs,acctrs,acctcs):
+   print('        1.1.- Generating the Bams')
    empty_list = []
    for year in years:
+      #print('\n')
+      print('           Current year: {}'.format(year))
       for nif in nifs:
+         #print('Current nif: {}'.format(nif))
          for acctr in acctrs:
             for acctc in acctcs:
                empty_list.append([year,nif,acctr,acctc,lookup_dat(table,year,nif,acctr,acctc)])
@@ -768,7 +773,9 @@ def bam_generator(table,years,nifs,acctrs,acctcs):
    return result
 
 def bam_completion(table,years,nifs):
+   print('        1.2.- Completing the Bams')
    for year in years:
+      print('           Current year: {}'.format(year))
       for nif in nifs:
          table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='03.1.0') & (table['acctc']=='02.1.0')), ['value']] =             \
          table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='02.1.0') & (table['acctc']=='01.1.0')), ['value']].values[0] -   \
@@ -869,9 +876,38 @@ def bam_completion(table,years,nifs):
          table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='14.1.0') & (table['acctc']=='01.2.2')), ['value']].values[0]  -  \
          table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='14.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0]
 
-
-
-   #result = pd.DataFrame(empty_list,columns=['year','nif','acctr','acctc','value'])	
-
-
    return table
+
+
+def bam_dictionaries(table,years,nifs):
+   print('        1.3.- Generating Bam dictionaries')
+   bam_dic = {}
+   for year in years:
+      bam_dic[year] = {}
+      print('           Current year: {}'.format(year))
+      for nif in nifs:
+         bam_dic[year][nif] = table.loc[((table['year']==year)  & (table['nif']==nif))]
+
+   return bam_dic
+
+def bam_checking(table,years,nifs):
+   print('        1.4.- Checking Bams')
+   bam_arrays = {}
+   col_sums = {}
+   row_sums = {}
+   sum_difs = {}
+   
+   for year in years:
+      bam_arrays[year]  = {}
+      col_sums[year]    = {}
+      row_sums[year]    = {}
+      sum_difs[year]     = {}
+      print('           Current year: {}'.format(year))
+      for nif in nifs:
+         bam_arrays[year][nif]   = pd.pivot_table(table[year][nif], values = 'value', index = ['acctr'], columns=['acctc'], aggfunc=np.sum)
+         bam_arrays[year][nif]   = bam_arrays[year][nif].to_numpy()
+         col_sums[year][nif]     = bam_arrays[year][nif].sum(axis=0)
+         row_sums[year][nif]     = bam_arrays[year][nif].sum(axis=1)
+         sum_difs[year][nif]      = np.sum(col_sums[year][nif]-row_sums[year][nif])
+   
+   return col_sums,row_sums,sum_difs

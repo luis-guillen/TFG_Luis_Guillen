@@ -6,6 +6,7 @@ import pandas as pd
 import os
 import pickle
 import sys
+import time
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import statistics
@@ -37,22 +38,38 @@ acctrs=['01.1.0','01.2.1','01.2.2','01.2.3','02.1.0','03.1.0',
 acctcs=acctrs.copy()
 
 
-def bam_etl_1(lista_data):
-    data = lista_data  
+def bam_etl_1(lista_data,lista_years,lista_nifs):
+    data  = lista_data  
+    years = lista_years
+    nifs  = lista_nifs
 
 # Read data file:
-    years  = {}
-    nifs   = {}
-    bam0   = {}
-    bam    = {}
+    bam0    = {}
+    bam     = {}
+    bam_dic = {}
+    bam_arrays_dic = {}
+    col_sums_dic = {}
+    row_sums_dic = {}
+    col_sums_dic = {}
+    sum_difs_dic = {}
+    sum_difs_df  = {}
+    start_bam = time.time()    
+
+    #print('\n')
+    print('     1.- Generating and completing the bams')
+
     for dat in data:
         with open(os.path.join(tmppathint,'data_'+dat+'.pkl'),'rb') as f:data = pickle.load(f)
         table=data[dat].copy()
-        #years = pd.unique(table['year'])   
-        years = [2010]
-        #nifs  = pd.unique(table['nif']) 
-        nifs = ['A07411499']
-        bam[dat]  = lbam.bam_generator(table,years,nifs,acctrs,acctcs)
-        bam[dat]   = lbam.bam_completion(bam[dat],years,nifs)
-
-    return bam
+        bam[dat]                = lbam.bam_generator(table,years,nifs[dat],acctrs,acctcs)
+        print(f'        Time (min) --> generation time: {( time.time() - start_bam)/60}')
+        bam[dat]                = lbam.bam_completion(bam[dat],years,nifs[dat])
+        print(f'        Time (min) --> completion time: {( time.time() - start_bam)/60}')
+        bam_dic[dat]            = lbam.bam_dictionaries(bam[dat],years,nifs[dat])
+        print(f'        Time (min) --> dictionaries time: {( time.time() - start_bam)/60}')
+        col_sums_dic[dat],row_sums_dic[dat],sum_difs_dic[dat]   = lbam.bam_checking(bam_dic[dat],years,nifs[dat])
+        print(f'        Time (min) --> checking time: {( time.time() - start_bam)/60}')
+        sum_difs_df[dat]        = pd.DataFrame.from_dict(sum_difs_dic[dat], orient = 'index')
+        sum_difs_df[dat]        = sum_difs_df[dat].transpose()
+        print(f'        Time (min) --> difs df generation time: {( time.time() - start_bam)/60}')
+    return bam, bam_dic, col_sums_dic, row_sums_dic, sum_difs_dic,sum_difs_df
