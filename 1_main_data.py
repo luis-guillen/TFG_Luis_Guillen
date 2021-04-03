@@ -98,7 +98,8 @@ def main():
         with open(os.path.join(tmppathint,'cols_dic_'+dat)+'.pkl','wb') as f: pickle.dump(col_sums_dic, f)
         with open(os.path.join(tmppathint,'rows_dic_'+dat)+'.pkl','wb') as f: pickle.dump(row_sums_dic, f)
         with open(os.path.join(tmppathint,'difs_df_'+dat)+'.pkl','wb') as f: pickle.dump(sum_difs_df, f)
-    print(f'        Time (min)  --> fase2: {(time.time() - start_total}')
+
+    print(f'        Time (min)  --> fase2: {(time.time() - start_total)/60}')
     #print(f'Total Time: {time.time() - start_total}')
 
 main()
