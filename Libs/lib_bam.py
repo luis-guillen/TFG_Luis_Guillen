@@ -908,6 +908,6 @@ def bam_checking(table,years,nifs):
          bam_arrays[year][nif]   = bam_arrays[year][nif].to_numpy()
          col_sums[year][nif]     = bam_arrays[year][nif].sum(axis=0)
          row_sums[year][nif]     = bam_arrays[year][nif].sum(axis=1)
-         sum_difs[year][nif]      = np.sum(col_sums[year][nif]-row_sums[year][nif])
+         sum_difs[year][nif]     = np.sum(col_sums[year][nif]-row_sums[year][nif])
    
    return col_sums,row_sums,sum_difs

@@ -94,6 +94,7 @@ def main():
     for dat in data: 
         bam[dat].to_csv(os.path.join(tmppathint,'bam_'+dat)+'.csv', sep=';', decimal=',',index=False)
         sum_difs_df[dat].to_csv(os.path.join(tmppathint,'sum_difs_'+dat)+'.csv', sep=';', decimal=',',index=True)
+        with open(os.path.join(tmppathint,'bam_'+dat)+'.pkl','wb') as f: pickle.dump(bam, f)
         with open(os.path.join(tmppathint,'bam_dic_'+dat)+'.pkl','wb') as f: pickle.dump(bam_dic, f)
         with open(os.path.join(tmppathint,'cols_dic_'+dat)+'.pkl','wb') as f: pickle.dump(col_sums_dic, f)
         with open(os.path.join(tmppathint,'rows_dic_'+dat)+'.pkl','wb') as f: pickle.dump(row_sums_dic, f)
