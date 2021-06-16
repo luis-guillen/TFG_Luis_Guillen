@@ -1,8 +1,5 @@
 # coding: utf-8
 
-#Path definitions and functions
-#------------------------------
-
 # Standard library imports
 import os
 import sys
@@ -53,48 +50,15 @@ for file in files:
             sys.exit(0)
 
 
-
 def main():
     start_total = time.time()    
     #número de fases
     num_fases = 1
     
-    # realización de la primera fase del etl de la BAM: reading and preparing data
-    # ============================================================================
+# realización de la segunda fase del etl de la BAM: calculating table-1
+# =====================================================================
 
-    print('\n*** Executing ETL of BAM: Reading and preparing data -phase 1/{}:'.format(num_fases))
-    
-    # Reading the data:
-    data_dic,nifs  = prog1.data_etl_1(data)
-    
-    for dat in data:
-        with open(os.path.join(tmppathint,'data_'+dat)+'.pkl','wb') as f: pickle.dump(data_dic[dat], f)
-        data_dic[dat].to_csv(os.path.join(tmppathint,'data_'+dat)+'.csv', sep=';', decimal=',',index=False)
-#       nifs[dat] = ['A07411499','B38326997','A35457258']
-        with open(os.path.join(tmppathint,'nifs_'+dat)+'.pkl','wb') as f: pickle.dump(nifs[dat], f)
-        pd.DataFrame(nifs[dat]).to_csv(os.path.join(tmppathint,'nifs_'+dat)+'.csv', sep=';', decimal=',',index=False)
-
-    # Reading the maps:
-    map_dic = prog1.data_etl_2(maps)
-    
-    with open(os.path.join(tmppathint,'maps')+'.pkl','wb') as f: pickle.dump(map_dic, f)
-
-    for map in maps: 
-        pd.DataFrame(map_dic[map]).to_csv(os.path.join(tmppathint,'map_'+map)+'.csv', sep=';', decimal=',',index=False)
-
-    # Loading igic rates per year:
-   
-    igic = prog1.data_etl_3()
-
-    with open(os.path.join(tmppathint,'igic.pkl'),'wb') as f: pickle.dump(igic, f)
-    
-    print(f'        Time (min) --> fase1: {(time.time() - start_total)/60}')
-
-'''
-    # realización de la segunda fase del etl de la BAM: calculating table-1
-    # =====================================================================
-
-    print('\n*** Executing ETL of BAM: preparing table-1 -phase 2/{}:'.format(num_fases))
+    print('\n*** Executing ETL of BAM: preparing the bam -phase 1/{}:'.format(num_fases))
    
     # bam is a dictionary where only dat (e.g.: tur_1) is the key
     # bam_dic has the same information as bam but the keys are now dat, year and nif
@@ -103,19 +67,19 @@ def main():
     # sum_difs_dic presents tha dictionary with the sum of the cl and row differences
     # sum_dif_df presents these results in a df that is exported to csv.
 
-    bam, bam_dic, col_sums_dic, row_sums_dic, sum_difs_dic, sum_difs_df= prg_1_2_bam.bam_etl_1(data,years,nifs)
-
     for dat in data: 
+        with open(os.path.join(tmppathint,'nifs_'+dat+'.pkl'),'rb') as f:nifs = pickle.load(f)
+        nifs=nifs.tolist()
+        bam, bam_dic, col_sums_dic, row_sums_dic, sum_difs_dic, sum_difs_df = prog2.bam_etl_1(data,years,nifs)
         bam[dat].to_csv(os.path.join(tmppathint,'bam_'+dat)+'.csv', sep=';', decimal=',',index=False)
         sum_difs_df[dat].to_csv(os.path.join(tmppathint,'sum_difs_'+dat)+'.csv', sep=';', decimal=',',index=True)
-        with open(os.path.join(tmppathint,'bam_'+dat)+'.pkl','wb') as f: pickle.dump(bam, f)
-        with open(os.path.join(tmppathint,'bam_dic_'+dat)+'.pkl','wb') as f: pickle.dump(bam_dic, f)
+        with open(os.path.join(tmppathint,'bam_'+dat)+'.pkl','wb')      as f: pickle.dump(bam, f)
+        with open(os.path.join(tmppathint,'bam_dic_'+dat)+'.pkl','wb')  as f: pickle.dump(bam_dic, f)
         with open(os.path.join(tmppathint,'cols_dic_'+dat)+'.pkl','wb') as f: pickle.dump(col_sums_dic, f)
         with open(os.path.join(tmppathint,'rows_dic_'+dat)+'.pkl','wb') as f: pickle.dump(row_sums_dic, f)
-        with open(os.path.join(tmppathint,'difs_df_'+dat)+'.pkl','wb') as f: pickle.dump(sum_difs_df, f)
+        with open(os.path.join(tmppathint,'difs_df_'+dat)+'.pkl','wb')  as f: pickle.dump(sum_difs_df, f)
 
     print(f'        Time (min)  --> fase2: {(time.time() - start_total)/60}')
     #print(f'Total Time: {time.time() - start_total}')
-'''
 
 main()

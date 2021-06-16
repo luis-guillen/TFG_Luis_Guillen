@@ -1,14 +1,15 @@
 #prg_1_1_lectura_datos.py
 
 import importlib
+import sys
 import pandas as pd
 import os
 import pickle
 
 import time
-from Libs import lib_cmlp as cmlp
-from Libs import lib_bam as lbam
-
+# from Libs import lib_cmlp as cmlp
+# from Libs import lib_bam as lbam
+import Libs.lib_bam as lbam
 
 #Path definitions and functions
 #------------------------------
@@ -32,17 +33,17 @@ def data_etl_1(lista_data):
         #print('\n')
         print('     1.- Loading the bam data')
 
-        bam = {}
-
+        datos = {}
+        nifs  = {}
         for dat in data:
-            bam[dat]=lbam.import_bam(dat)
+            datos[dat]=lbam.import_bam(dat)
 
 # Renaming columns:
 
         for dat in data:
-                bam[dat].rename(columns={"año": "year"},inplace='True')    
-                        
-        return bam
+                datos[dat].rename(columns={"año": "year"},inplace='True')    
+                nifs[dat]  = pd.unique(datos[dat]['nif'])         
+        return datos,nifs
 
 # Loading mapping files:
 

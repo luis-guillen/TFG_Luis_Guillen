@@ -7,13 +7,20 @@ Localización de datos
         Usar data/int para guardar los ficheros intermedios
         Usar data/res para guardar los resultados finales
 
-Preparación de datos
+1.- Preparación de datos (1_main_data.py)
 
         Se parte del fichero "Sabi_Export_agregado bruto paso5.xlsx"
         Se eliminan las filas 2 y 3 (se deja solo el número de la cuenta como nombre de la columna) 
         se ponen todos los nombres de columna en minúsculas
         se cambia year por año
+        Este programa se ejecuta 
+
+
+
+
         Se prepara un csv y se guarda como bam.csv
+
+
 
 2) conda environment
 

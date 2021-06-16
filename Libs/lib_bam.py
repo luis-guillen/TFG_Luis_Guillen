@@ -42,12 +42,12 @@ def import_bam(dat):
 
    for file in data_files:
       data=pd.read_csv(os.path.join(tmppathent,file), delimiter=';', encoding='latin1', decimal='.',
-                        dtype={'id'     : object, 
+                        dtype={#'id'     : object, 
                         	    'idsabi' : object,
                                'nombre' : object,
                                'nif'    : object,
                                'año'    : int,
-                               '11000'  : float, '11100' : float,'11200'  : float,'11300'  : float,'11400'  : float,
+                               '11000'  : float,'11100'  : float,'11200'  : float,'11300'  : float,'11400'  : float,
                                '11500'  : float,'11600'  : float,'11700'  : float,'12000'  : float,'12100'  : float,
                                '12200'  : float,'12210'  : float,'12220'  : float,'12230'  : float,'12240'  : float,
                                '12250'  : float,'12260'  : float,'12300'  : float,'12400'  : float,'12500'  : float,
@@ -56,7 +56,7 @@ def import_bam(dat):
                                '21510'  : float,'21520'  : float,'21600'  : float,'21700'  : float,'21800'  : float,
                                '21900'  : float,'22000'  : float,'23000'  : float,'31000'  : float,'31100'  : float,
                                '31200'  : float,'31300'  : float,'31400'  : float,'31500'  : float,'31600'  : float,
-                               '31700'  : float,'32000'  : float,'32100'  : float,'32200'  : float, '32300'  : float,
+                               '31700'  : float,'32000'  : float,'32100'  : float,'32200'  : float,'32300'  : float,
                                '32400'  : float,'32500'  : float,'32600'  : float,'32700'  : float,'30000'  : float,
                                '40100'  : float,'40110'  : float,'40120'  : float,'40130'  : float,'40200'  : float,
                                '40300'  : float,'40400'  : float,'40410'  : float,'40420'  : float,'40430'  : float,
