@@ -41,7 +41,7 @@ def import_bam(dat):
    data_files = [f for f in os.listdir(tmppathent) if f.endswith('Sabi_Export_'+dat+'.csv')]
 
    for file in data_files:
-      data=pd.read_csv(os.path.join(tmppathent,file), delimiter=';', encoding='latin1', decimal='.',
+      data=pd.read_csv(os.path.join(tmppathent,file), delimiter=';', encoding='UTF-8', decimal=',',
                         dtype={#'id'     : object, 
                         	    'idsabi' : object,
                                'nombre' : object,
@@ -76,7 +76,7 @@ def import_bam(dat):
 # Select variables needed
 # -----------------------
 #         
-   data_var=['nif','año',
+      data_var=['nif','año',
             '11000','11100','11200','11300','11400','11500','11600','11700','12000','12100',
             '12200','12210','12220','12230','12240','12250','12260','12300','12400','12500',
             '12600','12700','10000','20000','21000','21100','21200','21300','21400','21500',
@@ -90,15 +90,26 @@ def import_bam(dat):
             '49200','49300','41900','49400','42000','49400','50010','50020','50030','50040',
             '50050','50060','50070','59200','50080','50090','50100','50110','50120','50130',
             '59300','59400','52013'
-            ] 
-   data = data[data_var].copy()
+            ]
+
+      data = data[data_var].copy()
+      #This is to eliminate observations (nifs) for which we do not have information
+      #for all the available years; if we do not so the rest of the calculations fail
+      data_group = data.groupby('nif').size().to_frame()
+      data_group.reset_index(level=0, inplace=True)
+      data_group.columns=['nif','count']
+      nyears = data['año'].nunique(dropna=True)
+      data_group_erase = data_group.drop(data_group["count"].loc[data_group["count"]==nyears].index)
+      erase=list(data_group_erase.iloc[:,0].values)
+      data = data[~data.nif.isin(erase)]
+
 
 # Change variable names
 # ---------------------
 
-   data_var_dict = {}
+      data_var_dict = {}
 
-   data_var_dict= {'11000':'acc11000','11100':'acc11100','11200':'acc11200','11300':'acc11300','11400':'acc11400','11500':'acc11500','11600':'acc11600','11700':'acc11700','12000':'acc12000','12100':'acc12100',
+      data_var_dict= {'11000':'acc11000','11100':'acc11100','11200':'acc11200','11300':'acc11300','11400':'acc11400','11500':'acc11500','11600':'acc11600','11700':'acc11700','12000':'acc12000','12100':'acc12100',
                    '12200':'acc12200','12210':'acc12210','12220':'acc12220','12230':'acc12230','12240':'acc12240','12250':'acc12250','12260':'acc12260','12300':'acc12300','12400':'acc12400','12500':'acc12500',
                    '12600':'acc12600','12700':'acc12700','10000':'acc10000','20000':'acc20000','21000':'acc21000','21100':'acc21100','21200':'acc21200','21300':'acc21300','21400':'acc21400','21500':'acc21500',
                    '21510':'acc21510','21520':'acc21520','21600':'acc21600','21700':'acc21700','21800':'acc21800','21900':'acc21900','22000':'acc22000','23000':'acc23000','31000':'acc31000','31100':'acc31100',
@@ -112,8 +123,7 @@ def import_bam(dat):
                    '50050':'acc50050','50060':'acc50060','50070':'acc50070','59200':'acc59200','50080':'acc50080','50090':'acc50090','50100':'acc50100','50110':'acc50110','50120':'acc50120','50130':'acc50130',
                    '59300':'acc59300','59400':'acc59400','52013':'acc52013'}
 
-   #bam.rename(columns=data_var_dict, errors='raise',inplace='True')
-
+      #bam.rename(columns=data_var_dict, errors='raise',inplace='True')
    return data
 
 def import_map(file):
@@ -254,6 +264,12 @@ def lookup_dat(table,year,nif,acctr,acctc):
       value_final = (1+v_igic)* ((v_11100-v_11100_prev) + (v_11200-v_11200_prev) + (v_11300-v_11300_prev) + (v_12100-v_12100_prev)
                      - v_40800 - v_41110 - v_40300) + v_igic * v_41120
 
+   # OJO: en realidad debería ser la cuenta 14.1.0; no salta error porque los tipos de igci son todos 0;
+   # Habría que ver qué ocurre si se incluye, pero no debería dar error; solo cambiarían los balances;
+   # Si se quiuere simular cambios en el IGIC, habría que tener en cuenta que en las compras habría que sumar el igic
+   # y descontarlas entonces en esta cuenta; También habría que tener en cuenta el resto del igic soportado (inputs)  y
+   # el igic repercutido
+   # elif acctr == '14.1.0' and acctc=='01.2.2':
 
    #Net taxes on fixed capital goods (output tax minus subsidies & supported and deductible indirect taxes)
    elif acctr == '14.2.0' and acctc=='01.2.2':
@@ -758,12 +774,16 @@ def lookup_dat(table,year,nif,acctr,acctc):
 
 
 def bam_generator(table,years,nifs,acctrs,acctcs):
-   print('        1.1.- Generating the Bams')
+   print('\n        1.1.- Generating the Bams')
+   #table.sort_values(by=['year','nif'] , inplace=True)
    empty_list = []
    for year in years:
       #print('\n')
       print('           Current year: {}'.format(year))
+      i=0
       for nif in nifs:
+         i=1+i
+         #print(i)
          #print('Current nif: {}'.format(nif))
          for acctr in acctrs:
             for acctc in acctcs:
@@ -773,114 +793,119 @@ def bam_generator(table,years,nifs,acctrs,acctcs):
    return result
 
 def bam_completion(table,years,nifs):
-   print('        1.2.- Completing the Bams')
+   print('\n        1.2.- Completing the Bams')
+   table.sort_values(by=['year','nif'] , inplace=True)
+   start_compl = time.time()
    for year in years:
+      
       print('           Current year: {}'.format(year))
+      
       for nif in nifs:
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='03.1.0') & (table['acctc']=='02.1.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='02.1.0') & (table['acctc']=='01.1.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='01.2.3') & (table['acctc']=='02.1.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.2.0') & (table['acctc']=='02.1.0')), ['value']].values[0]
+         table1 = table.loc[((table['year']==year)  & (table['nif']==nif))]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='03.1.0')  & (table['acctc']=='02.1.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='02.1.0') & (table1['acctc']=='01.1.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='01.2.3') & (table1['acctc']=='02.1.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='09.2.0') & (table1['acctc']=='02.1.0')), ['value']].values[0]
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.3.0') & (table['acctc']=='03.1.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='03.1.0') & (table['acctc']=='02.1.0')), ['value']].values[0] -    \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.1.1') & (table['acctc']=='03.1.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.1.2') & (table['acctc']=='03.1.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.1.3') & (table['acctc']=='03.1.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.2.0') & (table['acctc']=='03.1.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='04.3.0')  & (table['acctc']=='03.1.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='03.1.0') & (table1['acctc']=='02.1.0')), ['value']].values[0] -    \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='04.1.1') & (table1['acctc']=='03.1.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='04.1.2') & (table1['acctc']=='03.1.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='04.1.3') & (table1['acctc']=='03.1.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='04.2.0') & (table1['acctc']=='03.1.0')), ['value']].values[0]
          
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='05.1.0') & (table['acctc']=='04.3.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='04.3.0') & (table['acctc']=='03.1.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='05.1.0')  & (table['acctc']=='04.3.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='04.3.0') & (table1['acctc']=='03.1.0')), ['value']].values[0]
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='06.1.0') & (table['acctc']=='05.1.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='05.1.0') & (table['acctc']=='04.3.0')), ['value']].values[0] +   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='05.1.0') & (table['acctc']=='11.1.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='05.1.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='05.1.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='06.1.0')  & (table['acctc']=='05.1.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='05.1.0') & (table1['acctc']=='04.3.0')), ['value']].values[0] +   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='05.1.0') & (table1['acctc']=='11.1.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='11.1.0') & (table1['acctc']=='05.1.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='12.1.0') & (table1['acctc']=='05.1.0')), ['value']].values[0]
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='07.1.0') & (table['acctc']=='06.1.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='06.1.0') & (table['acctc']=='05.1.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='06.1.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='06.1.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='07.1.0')  & (table['acctc']=='06.1.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='06.1.0') & (table1['acctc']=='05.1.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='11.1.0') & (table1['acctc']=='06.1.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='12.1.0') & (table1['acctc']=='06.1.0')), ['value']].values[0]
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='07.1.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='07.1.0') & (table['acctc']=='06.1.0')), ['value']].values[0] +   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='07.1.0') & (table['acctc']=='13.1.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='07.1.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='08.1.0')  & (table['acctc']=='07.1.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='07.1.0') & (table1['acctc']=='06.1.0')), ['value']].values[0] +   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='07.1.0') & (table1['acctc']=='13.1.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='11.1.0') & (table1['acctc']=='07.1.0')), ['value']].values[0]
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='08.1.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='07.1.0')), ['value']].values[0] +   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='13.1.0')), ['value']].values[0] +   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='14.1.0')), ['value']].values[0] 
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='08.2.0')  & (table['acctc']=='08.1.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.1.0') & (table1['acctc']=='07.1.0')), ['value']].values[0] +   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.1.0') & (table1['acctc']=='13.1.0')), ['value']].values[0] +   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.1.0') & (table1['acctc']=='14.1.0')), ['value']].values[0] 
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.3.0') & (table['acctc']=='08.2.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='08.1.0')), ['value']].values[0] +   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='11.1.0')), ['value']].values[0] +   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='13.1.0')), ['value']].values[0] +   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='14.1.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='13.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0] -   \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='14.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='08.3.0')  & (table['acctc']=='08.2.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.2.0') & (table1['acctc']=='08.1.0')), ['value']].values[0] +   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.2.0') & (table1['acctc']=='11.1.0')), ['value']].values[0] +   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.2.0') & (table1['acctc']=='13.1.0')), ['value']].values[0] +   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.2.0') & (table1['acctc']=='14.1.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='11.1.0') & (table1['acctc']=='08.2.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='13.1.0') & (table1['acctc']=='08.2.0')), ['value']].values[0] -   \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='14.1.0') & (table1['acctc']=='08.2.0')), ['value']].values[0]
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.1.0') & (table['acctc']=='08.3.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='01.2.1') & (table['acctc']=='09.1.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='09.1.0')  & (table['acctc']=='08.3.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='01.2.1') & (table1['acctc']=='09.1.0')), ['value']].values[0]
    
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.2.0') & (table['acctc']=='08.3.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='01.1.0') & (table['acctc']=='09.2.0')), ['value']].values[0]  +  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='01.2.2') & (table['acctc']=='09.2.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.2.0') & (table['acctc']=='02.1.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='09.2.0')  & (table['acctc']=='08.3.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='01.1.0') & (table1['acctc']=='09.2.0')), ['value']].values[0]  +  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='01.2.2') & (table1['acctc']=='09.2.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='09.2.0') & (table1['acctc']=='02.1.0')), ['value']].values[0]
    
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.3.0') & (table['acctc']=='08.3.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.3.0') & (table['acctc']=='08.2.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.1.0') & (table['acctc']=='08.3.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.2.0') & (table['acctc']=='08.3.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.3.0') & (table['acctc']=='08.3.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='09.3.0')  & (table['acctc']=='08.3.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.3.0') & (table1['acctc']=='08.2.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='09.1.0') & (table1['acctc']=='08.3.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='09.2.0') & (table1['acctc']=='08.3.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='09.3.0') & (table1['acctc']=='08.3.0')), ['value']].values[0]
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='15.1.0') & (table['acctc']=='10.1.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='10.1.0') & (table['acctc']=='09.3.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.3.0') & (table['acctc']=='10.1.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='15.1.0')  & (table['acctc']=='10.1.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='10.1.0') & (table1['acctc']=='09.3.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='09.3.0') & (table1['acctc']=='10.1.0')), ['value']].values[0]
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='15.1.0') & (table['acctc']=='10.2.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='10.2.0') & (table['acctc']=='09.3.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='09.3.0') & (table['acctc']=='10.2.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='15.1.0')  & (table['acctc']=='10.2.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='10.2.0') & (table1['acctc']=='09.3.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='09.3.0') & (table1['acctc']=='10.2.0')), ['value']].values[0]
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='15.1.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='01.1.0') & (table['acctc']=='11.1.0')), ['value']].values[0]  +  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='05.1.0') & (table['acctc']=='11.1.0')), ['value']].values[0]  +  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='11.1.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='01.2.1')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='04.1.1')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='04.1.3')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='05.1.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='06.1.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='07.1.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='11.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='11.1.0')  & (table['acctc']=='15.1.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='01.1.0') & (table1['acctc']=='11.1.0')), ['value']].values[0]  +  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='05.1.0') & (table1['acctc']=='11.1.0')), ['value']].values[0]  +  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.1.0') & (table1['acctc']=='11.1.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='11.1.0') & (table1['acctc']=='01.2.1')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='11.1.0') & (table1['acctc']=='04.1.1')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='11.1.0') & (table1['acctc']=='04.1.3')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='11.1.0') & (table1['acctc']=='05.1.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='11.1.0') & (table1['acctc']=='06.1.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='11.1.0') & (table1['acctc']=='07.1.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='11.1.0') & (table1['acctc']=='08.2.0')), ['value']].values[0]
          
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='15.1.0')), ['value']] =          -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='01.1.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='01.2.1')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='04.1.2')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='04.2.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='05.1.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='12.1.0') & (table['acctc']=='06.1.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='12.1.0')  & (table['acctc']=='15.1.0')),  ['value']] =          -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='12.1.0') & (table1['acctc']=='01.1.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='12.1.0') & (table1['acctc']=='01.2.1')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='12.1.0') & (table1['acctc']=='04.1.2')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='12.1.0') & (table1['acctc']=='04.2.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='12.1.0') & (table1['acctc']=='05.1.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='12.1.0') & (table1['acctc']=='06.1.0')), ['value']].values[0]
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='13.1.0') & (table['acctc']=='15.1.0')), ['value']] =          -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='07.1.0') & (table['acctc']=='13.1.0')), ['value']].values[0]  +  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='13.1.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='13.1.0') & (table['acctc']=='01.2.2')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='13.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0]
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='13.1.0')  & (table['acctc']=='15.1.0')),  ['value']] =          -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='07.1.0') & (table1['acctc']=='13.1.0')), ['value']].values[0]  +  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.2.0') & (table1['acctc']=='13.1.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='13.1.0') & (table1['acctc']=='01.2.2')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='13.1.0') & (table1['acctc']=='08.2.0')), ['value']].values[0]
 
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='14.1.0') & (table['acctc']=='15.1.0')), ['value']] =             \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.1.0') & (table['acctc']=='14.1.0')), ['value']].values[0]  +  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='08.2.0') & (table['acctc']=='14.1.0')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='14.1.0') & (table['acctc']=='01.2.2')), ['value']].values[0]  -  \
-         table.loc[((table['year']==year)  & (table['nif']==nif) & (table['acctr']=='14.1.0') & (table['acctc']=='08.2.0')), ['value']].values[0]
-
+         table.loc[((table['year']==year)    & (table['nif']==nif)  & (table['acctr']=='14.1.0')  & (table['acctc']=='15.1.0')),  ['value']] =             \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.1.0') & (table1['acctc']=='14.1.0')), ['value']].values[0]  +  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='08.2.0') & (table1['acctc']=='14.1.0')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='14.1.0') & (table1['acctc']=='01.2.2')), ['value']].values[0]  -  \
+         table1.loc[((table1['year']==year)  & (table1['nif']==nif) & (table1['acctr']=='14.1.0') & (table1['acctc']=='08.2.0')), ['value']].values[0]
+      print(f'                 Elapsed time (min) --> {( time.time() - start_compl)/60}')
    return table
 
 
 def bam_dictionaries(table,years,nifs):
-   print('        1.3.- Generating Bam dictionaries')
+   print('\n        1.3.- Generating Bam dictionaries')
    bam_dic = {}
    for year in years:
       bam_dic[year] = {}
@@ -891,7 +916,7 @@ def bam_dictionaries(table,years,nifs):
    return bam_dic
 
 def bam_checking(table,years,nifs):
-   print('        1.4.- Checking Bams')
+   print('\n        1.4.- Checking Bams')
    bam_arrays = {}
    col_sums = {}
    row_sums = {}
@@ -911,3 +936,14 @@ def bam_checking(table,years,nifs):
          sum_difs[year][nif]     = np.sum(col_sums[year][nif]-row_sums[year][nif])
    
    return col_sums,row_sums,sum_difs
+
+def crea_bam_dataframe(datos_bam, filas, columnas):
+   df = pd.DataFrame(columns=columnas, index=filas)
+   for cuenta_fila in filas:
+      for cuenta_columna in columnas:
+         tmp = datos_bam[(datos_bam['acctr'] == cuenta_fila) & (datos_bam['acctc'] == cuenta_columna)]['value'].iloc[0]
+         # print("tmp {}".format(type(tmp)))
+         # print('{} - {}: \n{}'.format(cuenta_fila, cuenta_columna, tmp))
+         df.loc[cuenta_fila][cuenta_columna] = tmp
+
+   return df
