@@ -1,0 +1,49 @@
+QMainWindow {
+    background-color: #F5F5F5;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+QToolBar {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #f8f9fa, stop:1 #e9ecef);
+    border-bottom: 1px solid #dee2e6;
+    spacing: 5px;
+    padding: 3px;
+}
+
+QDockWidget {
+    titlebar-close-icon: url(close.svg);
+    titlebar-normal-icon: url(undock.svg);
+    border: 1px solid #ced4da;
+}
+
+QDockWidget::title {
+    background: #007bff;
+    color: white;
+    padding: 5px;
+    text-align: center;
+}
+
+QTableView {
+    background-color: white;
+    alternate-background-color: #f8f9fa;
+    gridline-color: #dee2e6;
+    selection-background-color: #cfe2ff;
+}
+
+QHeaderView::section {
+    background-color: #e9ecef;
+    padding: 4px;
+    border: 1px solid #dee2e6;
+}
+
+QProgressBar {
+    border: 1px solid #ced4da;
+    border-radius: 3px;
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    background-color: #007bff;
+    width: 10px;
+}

@@ -1,0 +1,21 @@
+# Python
+*.pyc
+__pycache__/
+
+# Archivos binarios grandes
+*.xlsx
+*.csv
+*.pkl
+
+# MacOS
+.DS_Store
+
+# Jupyter y archivos de prueba
+#*.ipynb
+#*copy.py
+#s*copia.py
+requirements_bam.text
+
+# IDE
+.vscode/
+.idea/
