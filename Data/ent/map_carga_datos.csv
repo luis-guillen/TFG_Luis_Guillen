@@ -1,0 +1,122 @@
+11000;A) Non-current assests 
+11100;I. Intangible assets
+11200;II. Property, plant & equipment
+11300;III. Investment property
+11400;IV. Non-current financial investments in group companies & associates
+11500;V. Non-current financial investments
+11600;VI. Deferred tax assets
+11700;VII. Non-current trade & other receivables
+12000;B) Current assests 
+12100;I. Non-current assets held for sale
+12200;II. Inventories
+12210;1. Goods for resale
+12220;2. Raw materials & other supplies
+12230;3. Work in progress
+12240;4. Finished goods
+12250;5. By-products, waste & recovered materials
+12260;6. Advances to suppliers
+12300;III. Trade & other receivables
+12400;IV. Current investments in group companies & associates
+12500;V. Current investments
+12600;VI. Prepayments for current assets
+12700;VII Cash & cash equivalents
+10000;Total assets
+20000;A) Equity
+21000;A-1) Capital & reserves without valuation adjustments
+21100;I. Capital
+21200;II. Share premium
+21300;III. Reserves
+21400;IV. (Own shares & equity holdings)
+21500;V. Prior periods'  profit & losses
+21510;1. Retained earnings
+21520;2. (Prior periods' losses)
+21600;VI. Other equity holder contributions
+21700;VII. Profit/(loss) for the period
+21800;VIII. (Interim dividend)
+21900;IX. Other equity instruments
+22000;A-2) Valuation adjustments
+23000;A-3) Grants, donations & bequests received
+31000;B) Non-current liabilities
+31100;I. Non-current provisions
+31200;II. Non-current payables
+31300;III. Non-current payables, group companies & associates
+31400;IV. Deferred tax liabilities
+31500;V. Non-current accruals
+31600;VI. Non-current trade & other payables
+31700;VII. Non-current debts with special characteristics
+32000;C) Current liabilities
+32100;I. Liabilities associated with non-current assets held for sale
+32200;II. Current provisions
+32300;III. Current payables
+32400;IV. Current payables, group & associated companies
+32500;V. Trade & other payables
+32600;VI. Current accruals
+32700;VII. Current debts with special characteristics
+30000;Total equity & liabilities
+40100;1. Revenue
+40110;a) Sales
+40120;b) Services provided
+40130;c) Financial income of holding companies
+40200;2. Changes in inventories of finished goods & work in progress
+40300;3. Work carried out by the company for assets
+40400;4. Supplies
+40410;a) Merchandise used
+40420;b) Raw materials & other consumables used
+40430;c) Subcontracted work
+40440;d) Impairment of merchandise, raw materials & other supplies
+40500;5. Other operating income
+40510;a) Non-trading & other operating income
+40520;b) Operating grants taken to income
+40600;6. Personnel expenses
+40610;a) Salaries & wages
+40620;b) Employee benefits expense
+40630;c) Provisions
+40700;7. Other operating expenses
+40710;a) External services
+40720;b) Taxes
+40730;c) Losses, impairment & changes in trade provisions
+40740;d) Other operating expenses
+40750;e) Greenhouse gas emission expenses
+40800;8. Amortisation & depreciation
+40900;9. Non-financial & other capital grants
+41000;10. Provision surpluses
+41100;11. Impairment & gains/(losses) on disposal of fixed assets
+41110;a) Impairment & losses
+41120;b) Gains/(losses) on disposal & other
+41200;12. Negative goodwill on business combinations
+41300;13. Other results
+49100;A.1.) Results from operating activities
+41400;14. Finance income
+41500;15. Finance expenses
+41600;16. Change in fair value of financial instruments
+41700;17. Exchange gains/(losses)
+41800;18. Impairment & gains/(losses) on disposal of financial instruments
+41810;a) Impairment & losses
+41820;b) Gains/(losses) on disposal & other
+42100;19. Other finance income & expenses
+42110;a) Incorporation of financial expenses into the asset
+42120;b) Financial income derived from creditors agreements
+42130;c) Other income and expenses
+49200;A.2) Net finance income
+49300;A.3) Profit / (loss) before income tax (A.1+A.2)
+41900;20. Income tax
+49400;A.4) Profit / (loss) from continuing operations (A.3+20)
+42000;21. Profit / (loss) from discontinued operations, net of income tax
+49500;A.5) Profit / (loss) for the period (A.4+21)
+50010;I. Measurement of financial instruments
+50020;II. Cash flow hedges
+50030;III. Grants, donations & bequests received 
+50040;IV. Actuarial gains & losses & other adjustments
+50050;V. Non current assets held for sale & associated liabilities
+50060;VI. Conversion differences
+50070;VII. Tax effect
+59200;B) Total income & expense recognised directly in equity (I+II+III+IV+V)
+50080;VIII. Measurement of financial instruments
+50090;IX. Cash flow hedges
+50100;X. Grants, donations & bequests received
+50110;XI. Non current assets held for sale & associated liabilities
+50120;XII. Conversion differences
+50130;XIII. Tax effect
+59300;C) Total amounts transferred to the income statement (VI+VII+VIII+IX)
+59400;Total recognised income & expense (A+B+C)
+52013;(-) Dividends paid

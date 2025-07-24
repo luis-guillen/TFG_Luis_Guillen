@@ -3,8 +3,8 @@
 __pycache__/
 
 # Archivos binarios grandes
-*.xlsx
-*.csv
+#*.xlsx
+#*.csv
 *.pkl
 
 # MacOS
