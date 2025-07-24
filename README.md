@@ -1,51 +1,40 @@
-1) Datos:
+# Proyecto TFG: Análisis Financiero con Business Accounting Matrices (BAMs)
 
-Localización de datos
+Este repositorio contiene el código y materiales necesarios para preparar y analizar datos financieros de empresas mediante **Business Accounting Matrices (BAMs)**.
 
-        Asegurarse de que el fichero csv no contiene separadores de miles en los datos y que los decimales son comas
-        Comprobar que no hay cabeceras de los datos en medio del fichero
-        Comprobar que no han quedado filas vacías al final de los ficheos csv
-        Hay que dejar los ficheros de datos de partida en la ruta data/ent.
-        Usar data/int para guardar los ficheros intermedios (datos)
-        Usar data/res para guardar los resultados finales (bam)
+## 📁 Estructura del proyecto
 
-1.- Preparación de datos (1_main_data.py)
+- `1_main_data.py`, `2_main_bam.py`, `3_main_prepare_bam.py`, `4_main_empresas.py`:  
+  Scripts **principales** del pipeline. Estos son los archivos que deben utilizarse para ejecutar la preparación de los datos.
 
-        Se parte del fichero "Sabi_Export_agregado bruto paso5.xlsx"
-        Se eliminan las filas 2 y 3 (se deja solo el número de la cuenta como nombre de la columna)
-        se ponen todos los nombres de columna en minúsculase
-        se cambia year por año
-        Este programa se ejecuta
+- Archivos con `"copia"` en el nombre (por ejemplo: `1_main_data copia.py`) o similares:  
+  ⚠️ **No deben usarse.** Son versiones de prueba o desarrollo que se mantuvieron como referencia.
 
-        Se prepara un csv y se guarda como Sabi_Export_?????.csv
-        Se procura generar ficheros que no tengan más de 4000 registros
+- `analisis_bams.ipynb`:  
+  Notebook que contiene el análisis exploratorio de los BAMs generados. Aquí se visualizan, interpretan y comparan los resultados obtenidos.
 
-Los ficheros individuales por empresas se guardan en los directorios bam_1, bam_2 etc.
-        En bam_1 entrar todos los tur, con, cmi, pru
-        En bam_2 entran todos los mayoristas
+## ⚙️ Descripción técnica
 
-2) conda environment
+El pipeline actual replica la lógica de la implementación original, pero se ha optimizado para:
 
-Se ha creado un env de conda llamado bam. Una vez creado se puede generar el requirements.txt:
+- Reducir significativamente el tiempo de ejecución
+- Guardar automáticamente las BAMs en archivos `.pkl` ya preparados para análisis
+- Asegurar consistencia en la estructura de datos y su tratamiento
 
-        pip freeze > requirements.txt  (genera un listado de librerias instaladas)
-        para instalar los paquetes ejecutar conda install -r requirements.txt
+---
 
-tip: crear env de conda para cada proyecto e instalar las librerías que interesen ; después se genera el requirements.txt
+### ⚠️ Disclaimer
 
-3) En todos los ficheros hay que adaptar la lista de datos (data)
+El pipeline de preparación de datos sigue los mismos pasos que la implementación anterior, pero ha sido **reescrito y optimizado** para mayor eficiencia.  
+Como resultado, las matrices BAM generadas están **listas para su análisis** sin necesidad de reprocesar los datos.
 
-script 1_main_data.py: primera fase de la preparación de datos
-        It executes  "data_etl_1(data)"  from prg_1_1_lectura_datos.py which  loads the sabi dat, the mapping files and the IGIC data.
-        Saves the pickle files needed later
+---
 
-script 2_main_bam.py: segunda fase de la preparación de datos
-         It executes "bam_etl_1.py" from  "prg_1_2_bam.py" which generates the bams and executes:
-                                                                bam_generator
-                                                                bam_completion
-                                                                bam_dictionaries from the lib_bam.py file
+## 🚀 Uso
 
-script 3_main_prepare_bam: fase de preparación de un fichero por empresa para trabajar con ML
-        It executes "bam_etl_3.py" from "prg_1_3_prepare_bam.py"
+1. Ejecutar los scripts `X_main.py` en orden (`1_main_data.py` → `4_main_empresas.py`)
+2. Analizar los resultados en el notebook `analisis_bams.ipynb`
 
-script 4_main_empresas: preparación de ficheros individuales por empresa
+---
+
+Para cualquier duda, sugerencia o mejora, puedes abrir un *issue* o contactar al autor.
